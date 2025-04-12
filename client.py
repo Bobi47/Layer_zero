@@ -1,15 +1,14 @@
-from web3.middleware import async_geth_poa_middleware
-
-
 import asyncio
-from hexbytes import HexBytes
 
+from web3.middleware import async_geth_poa_middleware
+from hexbytes import HexBytes
 from curl_cffi.requests import AsyncSession
 from eth_typing import ChecksumAddress, HexStr
 from eth_account.signers.local import LocalAccount
 from web3.exceptions import Web3Exception
 from web3 import AsyncWeb3, Web3
 from web3.middleware import geth_poa_middleware
+
 
 
 
@@ -103,8 +102,6 @@ class Client:
     #     sign = self.w3.eth.account.sign_transaction(self.private_key,tx_params)
     #     return await self.w3.eth.send_raw_transaction(sign.rawTransaction)
 
-    from web3.types import ChecksumAddress
-    from web3 import Web3
 
     async def send_transaction(self,
                                to: ChecksumAddress,
@@ -132,7 +129,6 @@ class Client:
             base_fee = (await self.w3.eth.get_block('latest'))['baseFeePerGas']
             max_fee_per_gas = base_fee + max_priority_fee_per_gas
 
-            # 👇 Правильные ключи + приведение к hex
             tx_params['maxFeePerGas'] = Web3.to_hex(max_fee_per_gas)
             tx_params['maxPriorityFeePerGas'] = Web3.to_hex(max_priority_fee_per_gas)
 
@@ -142,7 +138,7 @@ class Client:
         if data:
             tx_params['data'] = data
 
-        tx_params['value'] = Web3.to_wei(value, 'ether') if value else 0
+        tx_params['value'] = value if value else 0
 
         gas = await self.w3.eth.estimate_gas(tx_params)
         tx_params['gas'] = int(gas * increase_gas)
